@@ -21,7 +21,8 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
   ]),
   updateWatchlistItem: jest.fn().mockResolvedValue({}),
   deleteWatchlistItem: jest.fn().mockResolvedValue(undefined),
-  addWatchlistItem: jest.fn().mockResolvedValue({})
+  addWatchlistItem: jest.fn().mockResolvedValue({}),
+  getOmdbDetails: jest.fn().mockResolvedValue({})
 }));
 
 const { WatchlistPage } = await import("../pages/WatchlistPage");

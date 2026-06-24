@@ -1,4 +1,4 @@
-import { BarChart3, CheckCircle2, Clapperboard, ListVideo, Tv } from "lucide-react";
+import { BarChart3, CalendarPlus, CheckCircle2, Clapperboard, ListVideo, Percent, Tv } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { StatsCard } from "../components/dashboard/StatsCard";
@@ -30,8 +30,8 @@ export const DashboardPage = () => {
       </div>
 
       {statsQuery.isLoading ? (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {Array.from({ length: 5 }).map((_, index) => (
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 7 }).map((_, index) => (
             <Skeleton key={index} className="h-28" />
           ))}
         </div>
@@ -41,12 +41,14 @@ export const DashboardPage = () => {
         </Card>
       ) : (
         <>
-          <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatsCard title="Total Items" value={stats?.total ?? 0} icon={ListVideo} />
             <StatsCard title="Watched" value={stats?.watched ?? 0} icon={CheckCircle2} />
             <StatsCard title="Want To Watch" value={stats?.wantToWatch ?? 0} icon={Clapperboard} />
-            <StatsCard title="Movies" value={stats?.movies ?? 0} icon={BarChart3} />
-            <StatsCard title="TV Shows" value={stats?.shows ?? 0} icon={Tv} />
+            <StatsCard title="Completion Rate" value={`${stats?.completionRate ?? 0}%`} icon={Percent} />
+            <StatsCard title="Added in Last 7 Days" value={stats?.recentlyAdded ?? 0} icon={CalendarPlus} />
+            <StatsCard title="Movies Count" value={stats?.movies ?? 0} icon={BarChart3} />
+            <StatsCard title="TV Shows Count" value={stats?.shows ?? 0} icon={Tv} />
           </section>
 
           <section className="mt-6 grid gap-4 lg:grid-cols-2">

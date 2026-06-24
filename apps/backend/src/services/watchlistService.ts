@@ -32,14 +32,20 @@ export class WatchlistService {
   }
 
   async stats() {
-    const [total, watched, wantToWatch, movies, shows] = await Promise.all([
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const [total, watched, wantToWatch, movies, shows, recentlyAdded] = await Promise.all([
       this.repository.count(),
       this.repository.countByStatus("WATCHED" as WatchStatus),
       this.repository.countByStatus("WANT_TO_WATCH" as WatchStatus),
       this.repository.countByType("movie"),
-      this.repository.countByType("series")
+      this.repository.countByType("series"),
+      this.repository.countCreatedSince(sevenDaysAgo)
     ]);
 
-    return { total, watched, wantToWatch, movies, shows };
+    const completionRate = total === 0 ? 0 : Math.round((watched / total) * 100);
+
+    return { total, watched, wantToWatch, movies, shows, recentlyAdded, completionRate };
   }
 }

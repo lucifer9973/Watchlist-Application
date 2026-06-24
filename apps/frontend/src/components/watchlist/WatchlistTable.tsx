@@ -1,4 +1,4 @@
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Eye, Trash2 } from "lucide-react";
 
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -8,11 +8,12 @@ import type { WatchlistItem } from "../../types";
 type Props = {
   items: WatchlistItem[];
   onEdit: (item: WatchlistItem) => void;
+  onOpenDetails: (item: WatchlistItem) => void;
   onDelete: (id: string) => void;
   isDeleting: boolean;
 };
 
-export const WatchlistTable = ({ items, onEdit, onDelete, isDeleting }: Props) => (
+export const WatchlistTable = ({ items, onEdit, onOpenDetails, onDelete, isDeleting }: Props) => (
   <Table>
     <thead>
       <tr>
@@ -50,6 +51,14 @@ export const WatchlistTable = ({ items, onEdit, onDelete, isDeleting }: Props) =
           <Td className="max-w-xs truncate">{item.notes ?? "-"}</Td>
           <Td>
             <div className="flex gap-2">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => onOpenDetails(item)}
+                aria-label={`View ${item.title} details`}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
               <Button size="icon" variant="ghost" onClick={() => onEdit(item)} aria-label={`Edit ${item.title}`}>
                 <Edit className="h-4 w-4" />
               </Button>

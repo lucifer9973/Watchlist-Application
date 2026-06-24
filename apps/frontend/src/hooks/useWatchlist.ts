@@ -8,6 +8,13 @@ import {
 } from "../api/watchlistApi";
 import type { CreateWatchlistItem, UpdateWatchlistItem, WatchlistFilters, WatchlistItem } from "../types";
 
+export class DuplicateWatchlistError extends Error {
+  constructor() {
+    super("Already in watchlist");
+    this.name = "DuplicateWatchlistError";
+  }
+}
+
 export const watchlistKeys = {
   all: ["watchlist"] as const,
   list: (filters: WatchlistFilters) => [...watchlistKeys.all, filters] as const
@@ -27,7 +34,20 @@ export const useWatchlist = (filters: WatchlistFilters = {}) => {
   };
 
   const addItem = useMutation({
-    mutationFn: (payload: CreateWatchlistItem) => addWatchlistItem(payload),
+    mutationFn: (payload: CreateWatchlistItem) => {
+      const cachedLists = queryClient.getQueriesData<WatchlistItem[]>({
+        queryKey: watchlistKeys.all
+      });
+      const exists = cachedLists.some(([, items]) =>
+        items?.some((item) => item.imdbId === payload.imdbId)
+      );
+
+      if (exists) {
+        return Promise.reject(new DuplicateWatchlistError());
+      }
+
+      return addWatchlistItem(payload);
+    },
     onSuccess: invalidate
   });
 

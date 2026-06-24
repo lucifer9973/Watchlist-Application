@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
 
+import {
+  ContentDetailsDrawer,
+  type ContentSummary
+} from "../components/content/ContentDetailsDrawer";
 import { EditWatchlistDialog } from "../components/watchlist/EditWatchlistDialog";
 import { WatchlistTable } from "../components/watchlist/WatchlistTable";
 import { Card, CardContent } from "../components/ui/card";
@@ -16,6 +20,7 @@ export const WatchlistPage = () => {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 250);
   const [editing, setEditing] = useState<WatchlistItem | null>(null);
+  const [selected, setSelected] = useState<ContentSummary | null>(null);
 
   const filters = useMemo(
     () => ({ status, sortBy, sortOrder: sortBy === "createdAt" ? "desc" : "asc", search: debouncedSearch }),
@@ -68,6 +73,15 @@ export const WatchlistPage = () => {
               <WatchlistTable
                 items={watchlist.data ?? []}
                 onEdit={setEditing}
+                onOpenDetails={(item) =>
+                  setSelected({
+                    imdbId: item.imdbId,
+                    title: item.title,
+                    year: item.year,
+                    type: item.type,
+                    poster: item.poster
+                  })
+                }
                 onDelete={(id) => watchlist.deleteItem.mutate(id)}
                 isDeleting={watchlist.deleteItem.isPending}
               />
@@ -89,6 +103,7 @@ export const WatchlistPage = () => {
           );
         }}
       />
+      <ContentDetailsDrawer content={selected} onClose={() => setSelected(null)} />
     </main>
   );
 };

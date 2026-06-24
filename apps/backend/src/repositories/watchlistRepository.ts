@@ -59,4 +59,14 @@ export class WatchlistRepository {
   countByType(type: string) {
     return this.db.watchlistItem.count({ where: { type } });
   }
+
+  countCreatedSince(createdAt: Date) {
+    return this.db.watchlistItem.count({
+      where: {
+        createdAt: {
+          gte: createdAt
+        }
+      }
+    });
+  }
 }

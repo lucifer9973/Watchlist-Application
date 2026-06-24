@@ -1,30 +1,59 @@
 import { Search } from "lucide-react";
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
+import {
+  ContentDetailsDrawer,
+  type ContentSummary
+} from "../components/content/ContentDetailsDrawer";
 import { SearchResultCard } from "../components/search/SearchResultCard";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Skeleton } from "../components/ui/skeleton";
+import { useToast } from "../components/ui/toast";
 import { useDebounce } from "../hooks/useDebounce";
 import { useSearchMovies } from "../hooks/useSearchMovies";
-import { useWatchlist } from "../hooks/useWatchlist";
+import { DuplicateWatchlistError, useWatchlist } from "../hooks/useWatchlist";
 import type { SearchResult, WatchStatus } from "../types";
 
 export const SearchPage = () => {
-  const [query, setQuery] = useState("");
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") ?? "";
+  const [query, setQuery] = useState(initialQuery);
+  const [selected, setSelected] = useState<ContentSummary | null>(null);
   const debouncedQuery = useDebounce(query);
   const searchQuery = useSearchMovies(debouncedQuery);
   const watchlist = useWatchlist();
+  const showToast = useToast();
+
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   const addResult = (result: SearchResult, status: WatchStatus) => {
-    watchlist.addItem.mutate({
-      imdbId: result.imdbID,
-      title: result.title,
-      year: result.year,
-      type: result.type,
-      poster: result.poster,
-      status
-    });
+    watchlist.addItem.mutate(
+      {
+        imdbId: result.imdbID,
+        title: result.title,
+        year: result.year,
+        type: result.type,
+        poster: result.poster,
+        status
+      },
+      {
+        onSuccess: () => showToast("Added to watchlist"),
+        onError: (error) => {
+          const message =
+            error instanceof DuplicateWatchlistError
+              ? error.message
+              : axios.isAxiosError<{ message?: string }>(error)
+                ? error.response?.data?.message ?? "Could not add title"
+                : "Could not add title";
+          showToast(message, "error");
+        }
+      }
+    );
   };
 
   return (
@@ -74,12 +103,22 @@ export const SearchPage = () => {
                 key={result.imdbID}
                 result={result}
                 onAdd={(status) => addResult(result, status)}
+                onOpenDetails={() =>
+                  setSelected({
+                    imdbId: result.imdbID,
+                    title: result.title,
+                    year: result.year,
+                    type: result.type,
+                    poster: result.poster
+                  })
+                }
                 isAdding={watchlist.addItem.isPending}
               />
             ))}
           </div>
         )}
       </section>
+      <ContentDetailsDrawer content={selected} onClose={() => setSelected(null)} />
     </main>
   );
 };

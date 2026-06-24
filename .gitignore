@@ -12,3 +12,7 @@ apps/*/node_modules
 apps/backend/prisma/dev.db
 apps/backend/prisma/*.db
 apps/backend/prisma/migrations/*/migration.sql.journal
+.tmp/
+artifacts/
+scripts/phase1-browser-evidence.mjs
+

@@ -9,7 +9,9 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
     watched: 3,
     wantToWatch: 2,
     movies: 4,
-    shows: 1
+    shows: 1,
+    recentlyAdded: 2,
+    completionRate: 60
   })
 }));
 
@@ -21,6 +23,7 @@ describe("DashboardPage", () => {
 
     expect(await screen.findByText("Total Items")).toBeInTheDocument();
     expect(screen.getByText("5")).toBeInTheDocument();
-    expect(screen.getByText("TV Shows")).toBeInTheDocument();
+    expect(screen.getByText("TV Shows Count")).toBeInTheDocument();
+    expect(screen.getByText("60%")).toBeInTheDocument();
   });
 });

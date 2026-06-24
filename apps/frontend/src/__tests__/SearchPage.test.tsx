@@ -18,7 +18,8 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
   getWatchlist: jest.fn().mockResolvedValue([]),
   updateWatchlistItem: jest.fn().mockResolvedValue({}),
   deleteWatchlistItem: jest.fn().mockResolvedValue(undefined),
-  getDashboardStats: jest.fn().mockResolvedValue({})
+  getDashboardStats: jest.fn().mockResolvedValue({}),
+  getOmdbDetails: jest.fn().mockResolvedValue({})
 }));
 
 const { SearchPage } = await import("../pages/SearchPage");

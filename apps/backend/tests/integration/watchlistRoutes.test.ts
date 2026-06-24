@@ -18,4 +18,11 @@ describe("watchlist routes", () => {
     expect(response.status).toBe(200);
     expect(response.body.status).toBe("ok");
   });
+
+  it("validates IMDb IDs for details requests", async () => {
+    const response = await request(createApp()).get("/api/omdb/not-an-imdb-id");
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe("Validation failed");
+  });
 });

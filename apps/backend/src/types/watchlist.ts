@@ -30,4 +30,6 @@ export type DashboardStats = {
   wantToWatch: number;
   movies: number;
   shows: number;
+  recentlyAdded: number;
+  completionRate: number;
 };

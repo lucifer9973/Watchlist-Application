@@ -10,7 +10,8 @@ const repository = () => ({
   delete: jest.fn(),
   count: jest.fn(),
   countByStatus: jest.fn(),
-  countByType: jest.fn()
+  countByType: jest.fn(),
+  countCreatedSince: jest.fn()
 });
 
 describe("WatchlistService", () => {
@@ -29,6 +30,7 @@ describe("WatchlistService", () => {
     repo.count.mockResolvedValue(4 as never);
     repo.countByStatus.mockResolvedValueOnce(2 as never).mockResolvedValueOnce(2 as never);
     repo.countByType.mockResolvedValueOnce(3 as never).mockResolvedValueOnce(1 as never);
+    repo.countCreatedSince.mockResolvedValue(2 as never);
     const service = new WatchlistService(repo as never);
 
     await expect(service.stats()).resolves.toEqual({
@@ -36,7 +38,9 @@ describe("WatchlistService", () => {
       watched: 2,
       wantToWatch: 2,
       movies: 3,
-      shows: 1
+      shows: 1,
+      recentlyAdded: 2,
+      completionRate: 50
     });
   });
 });

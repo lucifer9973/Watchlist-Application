@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Eye, Plus } from "lucide-react";
 
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -8,10 +8,11 @@ import type { SearchResult, WatchStatus } from "../../types";
 type Props = {
   result: SearchResult;
   onAdd: (status: WatchStatus) => void;
+  onOpenDetails: () => void;
   isAdding: boolean;
 };
 
-export const SearchResultCard = ({ result, onAdd, isAdding }: Props) => (
+export const SearchResultCard = ({ result, onAdd, onOpenDetails, isAdding }: Props) => (
   <Card className="overflow-hidden">
     <CardContent className="grid grid-cols-[82px_1fr] gap-4 p-3">
       <div className="aspect-[2/3] overflow-hidden rounded-md bg-muted">
@@ -30,6 +31,9 @@ export const SearchResultCard = ({ result, onAdd, isAdding }: Props) => (
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="ghost" onClick={onOpenDetails}>
+            <Eye className="h-4 w-4" /> Details
+          </Button>
           <Button size="sm" onClick={() => onAdd("WANT_TO_WATCH")} disabled={isAdding}>
             <Plus className="h-4 w-4" /> Want
           </Button>

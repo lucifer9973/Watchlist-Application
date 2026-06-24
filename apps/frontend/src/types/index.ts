@@ -48,4 +48,18 @@ export type DashboardStats = {
   wantToWatch: number;
   movies: number;
   shows: number;
+  recentlyAdded: number;
+  completionRate: number;
+};
+
+export type OmdbDetails = {
+  Poster: string;
+  Title: string;
+  Year: string;
+  Genre: string;
+  Runtime: string;
+  Director: string;
+  Actors: string;
+  imdbRating: string;
+  Plot: string;
 };

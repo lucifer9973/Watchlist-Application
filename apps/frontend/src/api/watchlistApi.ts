@@ -2,6 +2,7 @@ import { apiClient } from "./client";
 import type {
   CreateWatchlistItem,
   DashboardStats,
+  OmdbDetails,
   SearchResult,
   UpdateWatchlistItem,
   WatchlistFilters,
@@ -38,5 +39,10 @@ export const deleteWatchlistItem = async (id: string) => {
 
 export const getDashboardStats = async () => {
   const { data } = await apiClient.get<DashboardStats>("/dashboard/stats");
+  return data;
+};
+
+export const getOmdbDetails = async (imdbId: string) => {
+  const { data } = await apiClient.get<OmdbDetails>(`/omdb/${imdbId}`);
   return data;
 };

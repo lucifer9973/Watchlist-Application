@@ -5,6 +5,7 @@ import morgan from "morgan";
 
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import { createDashboardRoutes } from "./routes/dashboardRoutes.js";
+import { createOmdbDetailsRoutes } from "./routes/omdbDetailsRoutes.js";
 import { createSearchRoutes } from "./routes/searchRoutes.js";
 import { createWatchlistRoutes } from "./routes/watchlistRoutes.js";
 
@@ -23,6 +24,7 @@ export const createApp = () => {
   app.use("/api/search", createSearchRoutes());
   app.use("/api/watchlist", createWatchlistRoutes());
   app.use("/api/dashboard", createDashboardRoutes());
+  app.use("/api/omdb", createOmdbDetailsRoutes());
 
   app.use(notFoundHandler);
   app.use(errorHandler);
