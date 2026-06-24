@@ -1,0 +1,14 @@
+node_modules
+.DS_Store
+.env
+.env.*
+dist
+coverage
+*.log
+.vscode
+apps/*/dist
+apps/*/coverage
+apps/*/node_modules
+apps/backend/prisma/dev.db
+apps/backend/prisma/*.db
+apps/backend/prisma/migrations/*/migration.sql.journal

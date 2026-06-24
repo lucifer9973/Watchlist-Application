@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum WatchStatus {
+  WATCHED
+  WANT_TO_WATCH
+}
+
+model WatchlistItem {
+  id        String      @id @default(uuid())
+  imdbId    String      @unique
+  title     String
+  year      String
+  type      String
+  poster    String?
+  status    WatchStatus
+  rating    Int?
+  notes     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([status])
+  @@index([title])
+  @@index([type])
+}
