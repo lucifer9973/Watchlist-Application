@@ -34,7 +34,7 @@ export const errorHandler = (
     if (error.code === "P2002") {
       return res.status(409).json({
         success: false,
-        message: "Already in watchlist"
+        message: "Already in Library"
       });
     }
 

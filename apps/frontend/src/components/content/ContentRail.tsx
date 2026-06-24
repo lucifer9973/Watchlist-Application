@@ -42,7 +42,22 @@ export const ContentRail = ({ title, description, items, emptyMessage, onOpenDet
                 <h3 className="truncate text-sm font-semibold">{item.title}</h3>
                 <div className="mt-2 flex flex-wrap gap-1">
                   <Badge>{item.year}</Badge>
-                  <Badge tone="accent">{item.type === "series" ? "TV" : "Movie"}</Badge>
+                  {item.contentType ? (
+                    <Badge tone="accent">
+                      {item.contentType === "MOVIE"
+                        ? "Movie"
+                        : item.contentType === "TV_SHOW"
+                          ? "TV Show"
+                          : item.contentType === "BOOK"
+                            ? "Book"
+                            : "Game"}
+                    </Badge>
+                  ) : (
+                    <Badge tone="accent">{item.type === "series" ? "TV" : "Movie"}</Badge>
+                  )}
+                  {item.collection && (
+                    <Badge tone="success" className="truncate max-w-full">{item.collection}</Badge>
+                  )}
                 </div>
               </div>
             </button>

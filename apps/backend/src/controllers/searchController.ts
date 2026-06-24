@@ -7,8 +7,8 @@ export class SearchController {
   constructor(private readonly omdbService: OmdbService) {}
 
   search = async (req: Request, res: Response) => {
-    const { q } = searchQuerySchema.parse(req.query);
-    const results = await this.omdbService.search(q);
+    const { q, type } = searchQuerySchema.parse(req.query);
+    const results = await this.omdbService.search(q, type);
     res.json(results);
   };
 }

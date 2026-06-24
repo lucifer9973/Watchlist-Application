@@ -2,26 +2,38 @@ import type { WatchStatus, WatchlistItem } from "@prisma/client";
 
 export type WatchlistItemEntity = WatchlistItem;
 
+export type ContentType = "MOVIE" | "TV_SHOW" | "BOOK" | "GAME";
+
 export type CreateWatchlistItemInput = {
-  imdbId: string;
+  imdbId?: string | null;
+  externalId?: string | null;
+  source?: string;
   title: string;
+  author?: string | null;
   year: string;
   type: string;
   poster?: string | null;
+
+  contentType?: ContentType;
+  collection?: string | null;
+
   status: WatchStatus;
   rating?: number | null;
   notes?: string | null;
 };
 
+
 export type UpdateWatchlistItemInput = Partial<
-  Pick<CreateWatchlistItemInput, "status" | "rating" | "notes">
+  Pick<CreateWatchlistItemInput, "status" | "rating" | "notes" | "collection">
 >;
+
 
 export type WatchlistFilters = {
   status?: WatchStatus;
   search?: string;
   sortBy?: "title" | "year" | "createdAt";
   sortOrder?: "asc" | "desc";
+  contentType?: ContentType;
 };
 
 export type DashboardStats = {
@@ -30,6 +42,8 @@ export type DashboardStats = {
   wantToWatch: number;
   movies: number;
   shows: number;
+  books: number;
+  games: number;
   recentlyAdded: number;
   completionRate: number;
 };

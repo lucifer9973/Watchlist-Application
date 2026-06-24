@@ -13,7 +13,7 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
       year: "1994",
       type: "movie",
       poster: null,
-      status: "WANT_TO_WATCH",
+      status: "PLANNED",
       rating: null,
       notes: null,
       createdAt: "2026-06-24T00:00:00.000Z",
@@ -23,7 +23,9 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
   addWatchlistItem: jest.fn().mockResolvedValue({}),
   updateWatchlistItem: jest.fn().mockResolvedValue({}),
   deleteWatchlistItem: jest.fn().mockResolvedValue(undefined),
-  getOmdbDetails: jest.fn().mockResolvedValue({})
+  getOmdbDetails: jest.fn().mockResolvedValue({}),
+  searchBooks: jest.fn().mockResolvedValue([]),
+  getBookDetails: jest.fn().mockResolvedValue({})
 }));
 
 const { HomePage } = await import("../pages/HomePage");
@@ -33,7 +35,7 @@ describe("HomePage", () => {
     renderWithProviders(<HomePage />);
 
     expect((await screen.findAllByText("The Shawshank Redemption")).length).toBe(2);
-    const continueWatching = screen.getByText("Continue Watching");
+    const continueWatching = screen.getByText("Continue Progress");
     const recentlyAdded = screen.getByText("Recently Added");
     const trendingMovies = screen.getByText("Trending Movies");
 

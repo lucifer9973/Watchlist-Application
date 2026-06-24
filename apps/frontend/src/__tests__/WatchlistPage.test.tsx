@@ -12,7 +12,7 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
       year: "1994",
       type: "movie",
       poster: null,
-      status: "WATCHED",
+      status: "COMPLETED",
       rating: 10,
       notes: "A favorite",
       createdAt: "2026-01-01T00:00:00.000Z",
@@ -22,7 +22,9 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
   updateWatchlistItem: jest.fn().mockResolvedValue({}),
   deleteWatchlistItem: jest.fn().mockResolvedValue(undefined),
   addWatchlistItem: jest.fn().mockResolvedValue({}),
-  getOmdbDetails: jest.fn().mockResolvedValue({})
+  getOmdbDetails: jest.fn().mockResolvedValue({}),
+  searchBooks: jest.fn().mockResolvedValue([]),
+  getBookDetails: jest.fn().mockResolvedValue({})
 }));
 
 const { WatchlistPage } = await import("../pages/WatchlistPage");

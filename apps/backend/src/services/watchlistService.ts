@@ -35,17 +35,20 @@ export class WatchlistService {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const [total, watched, wantToWatch, movies, shows, recentlyAdded] = await Promise.all([
+    const [total, watched, wantToWatch, movies, shows, books, games, recentlyAdded] = await Promise.all([
       this.repository.count(),
-      this.repository.countByStatus("WATCHED" as WatchStatus),
-      this.repository.countByStatus("WANT_TO_WATCH" as WatchStatus),
-      this.repository.countByType("movie"),
-      this.repository.countByType("series"),
+      this.repository.countByStatus("COMPLETED" as WatchStatus),
+      this.repository.countByStatus("PLANNED" as WatchStatus),
+      this.repository.countByContentType("MOVIE"),
+      this.repository.countByContentType("TV_SHOW"),
+      this.repository.countByContentType("BOOK"),
+      this.repository.countByContentType("GAME"),
       this.repository.countCreatedSince(sevenDaysAgo)
     ]);
 
+
     const completionRate = total === 0 ? 0 : Math.round((watched / total) * 100);
 
-    return { total, watched, wantToWatch, movies, shows, recentlyAdded, completionRate };
+    return { total, watched, wantToWatch, movies, shows, books, games, recentlyAdded, completionRate };
   }
 }

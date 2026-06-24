@@ -10,7 +10,7 @@ import type { CreateWatchlistItem, UpdateWatchlistItem, WatchlistFilters, Watchl
 
 export class DuplicateWatchlistError extends Error {
   constructor() {
-    super("Already in watchlist");
+    super("Already in Library");
     this.name = "DuplicateWatchlistError";
   }
 }
@@ -39,7 +39,14 @@ export const useWatchlist = (filters: WatchlistFilters = {}) => {
         queryKey: watchlistKeys.all
       });
       const exists = cachedLists.some(([, items]) =>
-        items?.some((item) => item.imdbId === payload.imdbId)
+        items?.some((item) => {
+          const pExt = payload.externalId || payload.imdbId;
+          const iExt = item.externalId || item.imdbId;
+          if (pExt && iExt) {
+            return pExt === iExt;
+          }
+          return false;
+        })
       );
 
       if (exists) {

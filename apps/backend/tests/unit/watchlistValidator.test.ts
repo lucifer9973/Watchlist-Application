@@ -13,7 +13,7 @@ describe("watchlist validators", () => {
       year: "2008-2013",
       type: "series",
       poster: "https://example.com/poster.jpg",
-      status: "WATCHED",
+      status: "COMPLETED",
       rating: 10,
       notes: "Peak television"
     });

@@ -8,24 +8,39 @@ datasource db {
 }
 
 enum WatchStatus {
-  WATCHED
-  WANT_TO_WATCH
+  PLANNED
+  COMPLETED
+}
+
+enum ContentType {
+  MOVIE
+  TV_SHOW
+  BOOK
+  GAME
 }
 
 model WatchlistItem {
-  id        String      @id @default(uuid())
-  imdbId    String      @unique
-  title     String
-  year      String
-  type      String
-  poster    String?
-  status    WatchStatus
-  rating    Int?
-  notes     String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id           String      @id @default(uuid())
+  imdbId       String?
+  externalId   String
+  source       String      @default("OMDB")
+  title        String
+  author       String?     @db.VarChar(255)
+  year         String
+  type         String
+  contentType  ContentType @default(MOVIE)
+  collection   String?
+  poster       String?
+  status       WatchStatus
+  rating       Int?
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
+  @@unique([source, externalId])
   @@index([status])
   @@index([title])
   @@index([type])
+  @@index([contentType])
 }
+

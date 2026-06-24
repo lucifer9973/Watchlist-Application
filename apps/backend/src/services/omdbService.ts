@@ -19,11 +19,11 @@ type OmdbSearchResponse =
 export class OmdbService {
   private readonly cache = new TtlCache<SearchResult[]>(1000 * 60 * 10);
 
-  async search(query: string): Promise<SearchResult[]> {
+  async search(query: string, type?: "movie" | "series"): Promise<SearchResult[]> {
     const normalizedQuery = query.trim();
     if (normalizedQuery.length < 3) return [];
 
-    const cacheKey = normalizedQuery.toLowerCase();
+    const cacheKey = `${normalizedQuery.toLowerCase()}:${type ?? ""}`;
     const cached = this.cache.get(cacheKey);
     if (cached) return cached;
 
@@ -31,7 +31,8 @@ export class OmdbService {
       const { data } = await axios.get<OmdbSearchResponse>("https://www.omdbapi.com/", {
         params: {
           apikey: env.OMDB_API_KEY,
-          s: normalizedQuery
+          s: normalizedQuery,
+          type
         },
         timeout: 8000
       });
