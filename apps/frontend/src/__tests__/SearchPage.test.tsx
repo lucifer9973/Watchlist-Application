@@ -21,7 +21,15 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
   getDashboardStats: jest.fn().mockResolvedValue({}),
   getOmdbDetails: jest.fn().mockResolvedValue({}),
   searchBooks: jest.fn().mockResolvedValue([]),
-  getBookDetails: jest.fn().mockResolvedValue({})
+  getBookDetails: jest.fn().mockResolvedValue({}),
+  searchGames: jest.fn().mockResolvedValue([]),
+  getGameDetails: jest.fn().mockResolvedValue({}),
+  restoreWatchlistItem: jest.fn().mockResolvedValue({}),
+  deleteWatchlistItemForever: jest.fn().mockResolvedValue(undefined),
+  getCollections: jest.fn().mockResolvedValue([]),
+  createCollection: jest.fn().mockResolvedValue({}),
+  renameCollection: jest.fn().mockResolvedValue({}),
+  deleteCollection: jest.fn().mockResolvedValue(undefined)
 }));
 
 const { SearchPage } = await import("../pages/SearchPage");
@@ -30,7 +38,7 @@ describe("SearchPage", () => {
   it("searches and renders results", async () => {
     renderWithProviders(<SearchPage />);
 
-    await userEvent.type(screen.getByLabelText(/search movies/i), "breaking");
+    await userEvent.type(screen.getByLabelText(/search/i), "breaking");
 
     await waitFor(() => expect(screen.getByText("Breaking Bad")).toBeInTheDocument());
     expect(screen.getByText("TV Show")).toBeInTheDocument();

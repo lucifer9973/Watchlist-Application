@@ -9,7 +9,10 @@ export const watchlistQuerySchema = z.object({
   search: z.string().trim().optional(),
   sortBy: z.enum(["title", "year", "createdAt"]).default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
-  contentType: contentTypeSchema.optional()
+  contentType: contentTypeSchema.optional(),
+  favorite: z.preprocess((val) => val === "true" || val === true, z.boolean()).optional(),
+  collection: z.string().trim().optional(),
+  showDeleted: z.preprocess((val) => val === "true" || val === true, z.boolean()).optional()
 });
 
 export const createWatchlistItemSchema = z.object({
@@ -25,7 +28,8 @@ export const createWatchlistItemSchema = z.object({
   rating: z.number().int().min(1).max(10).nullable().optional(),
   notes: z.string().trim().max(1000).nullable().optional(),
   contentType: contentTypeSchema.optional(),
-  collection: z.string().trim().max(100).nullable().optional()
+  collection: z.string().trim().max(100).nullable().optional(),
+  favorite: z.boolean().optional()
 });
 
 export const updateWatchlistItemSchema = z
@@ -33,7 +37,8 @@ export const updateWatchlistItemSchema = z
     status: watchStatusSchema.optional(),
     rating: z.number().int().min(1).max(10).nullable().optional(),
     notes: z.string().trim().max(1000).nullable().optional(),
-    collection: z.string().trim().max(100).nullable().optional()
+    collection: z.string().trim().max(100).nullable().optional(),
+    favorite: z.boolean().optional()
   })
   .refine((value) => Object.keys(value).length > 0, {
     message: "At least one field is required"

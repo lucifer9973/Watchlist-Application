@@ -12,8 +12,8 @@ export class OpenLibraryService {
     "Accept": "application/json"
   };
 
-  private async fetchWithRetry(url: string, timeoutMs = 6000, maxRetries = 2): Promise<Response> {
-    let delay = 1000;
+  private async fetchWithRetry(url: string, timeoutMs = 8000, maxRetries = 2): Promise<Response> {
+    let delay = 500;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await fetch(url, {
@@ -56,7 +56,7 @@ export class OpenLibraryService {
           console.warn(`Open Library unknown error (attempt ${attempt}/${maxRetries})`);
         }
         await new Promise((resolve) => setTimeout(resolve, delay));
-        delay *= 2; // Exponential backoff
+        delay *= 2; // Exponential backoff (500ms, then 1000ms)
       }
     }
     throw new HttpError(502, "Request failed after maximum retries");
@@ -72,7 +72,7 @@ export class OpenLibraryService {
 
     try {
       const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(normalizedQuery)}&limit=15`;
-      const response = await this.fetchWithRetry(url, 6000, 2);
+      const response = await this.fetchWithRetry(url, 8000, 2);
 
       if (!response.ok) {
         throw new HttpError(response.status, "Open Library search request failed");

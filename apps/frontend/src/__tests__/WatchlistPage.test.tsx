@@ -24,7 +24,15 @@ jest.unstable_mockModule("../api/watchlistApi", () => ({
   addWatchlistItem: jest.fn().mockResolvedValue({}),
   getOmdbDetails: jest.fn().mockResolvedValue({}),
   searchBooks: jest.fn().mockResolvedValue([]),
-  getBookDetails: jest.fn().mockResolvedValue({})
+  getBookDetails: jest.fn().mockResolvedValue({}),
+  searchGames: jest.fn().mockResolvedValue([]),
+  getGameDetails: jest.fn().mockResolvedValue({}),
+  restoreWatchlistItem: jest.fn().mockResolvedValue({}),
+  deleteWatchlistItemForever: jest.fn().mockResolvedValue(undefined),
+  getCollections: jest.fn().mockResolvedValue([]),
+  createCollection: jest.fn().mockResolvedValue({}),
+  renameCollection: jest.fn().mockResolvedValue({}),
+  deleteCollection: jest.fn().mockResolvedValue(undefined)
 }));
 
 const { WatchlistPage } = await import("../pages/WatchlistPage");

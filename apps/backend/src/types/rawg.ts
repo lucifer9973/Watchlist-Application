@@ -54,7 +54,7 @@ export interface RawgGameSearchResult {
   background_image: string | null;
   metacritic: number | null;
   platforms: Array<{ platform: RawgPlatform }>;
-  genres: Array<{ genre: RawgGenre }>;
+  genres: RawgGenre[];
 }
 
 export interface RawgGameDetails {
@@ -62,10 +62,11 @@ export interface RawgGameDetails {
   name: string;
   released: string | null;
   background_image: string | null;
+  background_image_additional: string | null;
   description_raw: string | null;
   metacritic: number | null;
   platforms: Array<{ platform: RawgPlatform }>;
-  genres: Array<{ genre: RawgGenre }>;
+  genres: RawgGenre[];
   developers: Array<{ developer: RawgDeveloper }>;
   publishers: Array<{ publisher: RawgPublisher }>;
   ratings: RawgRating[];
@@ -73,6 +74,7 @@ export interface RawgGameDetails {
   stores: Array<{ store: RawgStore }>;
   esrb_rating: RawgEsrbRating | null;
   website: string | null;
+  reddit_url: string | null;
   playtime: number;
 }
 
@@ -102,5 +104,6 @@ export interface GameDetails {
   stores: string[];
   esrbRating: string | null;
   website: string | null;
+  redditUrl: string | null;
   playtime: number;
 }

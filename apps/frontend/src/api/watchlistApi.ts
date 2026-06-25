@@ -7,7 +7,8 @@ import type {
   UpdateWatchlistItem,
   WatchlistFilters,
   WatchlistItem,
-  BookDetails
+  BookDetails,
+  GameDetails
 } from "../types";
 
 export const searchMovies = async (query: string, type?: "movie" | "series") => {
@@ -66,3 +67,56 @@ export const getBookDetails = async (workId: string) => {
   const { data } = await apiClient.get<BookDetails>(`/books/${workId}`);
   return data;
 };
+
+export const searchGames = async (query: string): Promise<SearchResult[]> => {
+  const { data } = await apiClient.get<any[]>("/games/search", { params: { q: query } });
+  return data.map((item) => ({
+    imdbID: item.id,
+    title: item.title,
+    year: item.year,
+    poster: item.poster,
+    type: "game" as const,
+    externalId: item.id,
+    source: "RAWG" as const
+  }));
+};
+
+export const getGameDetails = async (id: string): Promise<GameDetails> => {
+  const { data } = await apiClient.get<GameDetails>(`/games/${id}`);
+  return data;
+};
+
+export const restoreWatchlistItem = async (id: string) => {
+  const { data } = await apiClient.post<{ message: string }>(`/watchlist/restore/${id}`);
+  return data;
+};
+
+export const deleteWatchlistItemForever = async (id: string) => {
+  await apiClient.delete(`/watchlist/deleted/${id}`);
+};
+
+export interface CollectionEntity {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+export const getCollections = async () => {
+  const { data } = await apiClient.get<CollectionEntity[]>("/collections");
+  return data;
+};
+
+export const createCollection = async (name: string) => {
+  const { data } = await apiClient.post<CollectionEntity>("/collections", { name });
+  return data;
+};
+
+export const renameCollection = async (id: string, name: string) => {
+  const { data } = await apiClient.put<CollectionEntity>(`/collections/${id}`, { name });
+  return data;
+};
+
+export const deleteCollection = async (id: string) => {
+  await apiClient.delete(`/collections/${id}`);
+};
+

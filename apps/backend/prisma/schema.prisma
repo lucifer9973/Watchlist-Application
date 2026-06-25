@@ -9,6 +9,7 @@ datasource db {
 
 enum WatchStatus {
   PLANNED
+  WATCHING
   COMPLETED
 }
 
@@ -34,6 +35,8 @@ model WatchlistItem {
   status       WatchStatus
   rating       Int?
   notes        String?
+  favorite     Boolean     @default(false)
+  deletedAt    DateTime?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
@@ -42,5 +45,13 @@ model WatchlistItem {
   @@index([title])
   @@index([type])
   @@index([contentType])
+  @@index([deletedAt])
 }
+
+model Collection {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
+
 

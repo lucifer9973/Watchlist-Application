@@ -1,3 +1,4 @@
+import { env } from "../config/env.js";
 import { TtlCache } from "../utils/cache.js";
 import { HttpError } from "../utils/httpError.js";
 import type { GameSearchResult, GameDetails, RawgGameSearchResult, RawgGameDetails } from "../types/rawg.js";
@@ -11,8 +12,8 @@ export class RawgService {
     "Accept": "application/json"
   };
 
-  private async fetchWithRetry(url: string, timeoutMs = 6000, maxRetries = 2): Promise<Response> {
-    let delay = 1000;
+  private async fetchWithRetry(url: string, timeoutMs = 8000, maxRetries = 2): Promise<Response> {
+    let delay = 500;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await fetch(url, {
@@ -51,7 +52,7 @@ export class RawgService {
           console.warn(`RAWG unknown error (attempt ${attempt}/${maxRetries})`);
         }
         await new Promise((resolve) => setTimeout(resolve, delay));
-        delay *= 2; // Exponential backoff
+        delay *= 2; // Exponential backoff (500ms, then 1000ms)
       }
     }
     throw new HttpError(502, "Request failed after maximum retries");
@@ -66,8 +67,9 @@ export class RawgService {
     if (cached) return cached;
 
     try {
-      const url = `https://api.rawg.io/api/games?key=${process.env.RAWG_API_KEY}&search=${encodeURIComponent(normalizedQuery)}&page_size=15`;
-      const response = await this.fetchWithRetry(url, 6000, 2);
+      const url = `https://api.rawg.io/api/games?key=${env.RAWG_API_KEY}&search=${encodeURIComponent(normalizedQuery)}&page_size=15`;
+      console.log(`[RAWG API Request] keyLength=${env.RAWG_API_KEY?.length ?? 0} url=${url.replace(env.RAWG_API_KEY, "REDACTED")}`);
+      const response = await this.fetchWithRetry(url, 8000, 2);
 
       if (!response.ok) {
         throw new HttpError(response.status, "RAWG search request failed");
@@ -86,7 +88,7 @@ export class RawgService {
         poster: game.background_image,
         metacritic: game.metacritic,
         platforms: game.platforms?.map((p) => p.platform.name) || [],
-        genres: game.genres?.map((g) => g.genre.name) || []
+        genres: game.genres?.map((g) => g.name) || []
       }));
 
       this.searchCache.set(cacheKey, results);
@@ -102,11 +104,18 @@ export class RawgService {
     if (cached) return cached;
 
     try {
-      const response = await this.fetchWithRetry(
-        `https://api.rawg.io/api/games/${gameId}?key=${process.env.RAWG_API_KEY}`,
-        6000,
-        2
-      );
+      const [response, screenshotsRes] = await Promise.all([
+        this.fetchWithRetry(
+          `https://api.rawg.io/api/games/${gameId}?key=${env.RAWG_API_KEY}`,
+          8000,
+          2
+        ),
+        this.fetchWithRetry(
+          `https://api.rawg.io/api/games/${gameId}/screenshots?key=${env.RAWG_API_KEY}`,
+          8000,
+          2
+        ).catch(() => null)
+      ]);
 
       if (response.status === 404) {
         throw new HttpError(404, "Game details not found");
@@ -117,6 +126,20 @@ export class RawgService {
 
       const data = await response.json() as RawgGameDetails;
 
+      let screenshots: string[] = [];
+      if (screenshotsRes && screenshotsRes.ok) {
+        try {
+          const sData = await screenshotsRes.json() as { results?: Array<{ image: string }> };
+          screenshots = sData.results?.map((s) => s.image) || [];
+        } catch (e) {
+          console.warn("Failed to parse screenshots response:", e);
+        }
+      }
+
+      if (data.background_image) screenshots.unshift(data.background_image);
+      if (data.background_image_additional) screenshots.push(data.background_image_additional);
+      screenshots = Array.from(new Set(screenshots));
+
       const details: GameDetails = {
         id: data.id.toString(),
         title: data.name,
@@ -125,14 +148,15 @@ export class RawgService {
         description: data.description_raw,
         metacritic: data.metacritic,
         platforms: data.platforms?.map((p) => p.platform.name) || [],
-        genres: data.genres?.map((g) => g.genre.name) || [],
-        developers: data.developers?.map((d) => d.developer.name) || [],
-        publishers: data.publishers?.map((p) => p.publisher.name) || [],
+        genres: data.genres?.map((g) => g.name) || [],
+        developers: data.developers?.map((d: any) => d.name) || [],
+        publishers: data.publishers?.map((p: any) => p.name) || [],
         ratings: data.ratings || [],
-        screenshots: data.screenshots?.map((s) => s.image) || [],
+        screenshots,
         stores: data.stores?.map((s) => s.store.name) || [],
         esrbRating: data.esrb_rating?.name || null,
         website: data.website,
+        redditUrl: data.reddit_url || null,
         playtime: data.playtime
       };
 

@@ -4,9 +4,12 @@ import {
   addWatchlistItem,
   deleteWatchlistItem,
   getWatchlist,
-  updateWatchlistItem
+  updateWatchlistItem,
+  restoreWatchlistItem,
+  deleteWatchlistItemForever
 } from "../api/watchlistApi";
 import type { CreateWatchlistItem, UpdateWatchlistItem, WatchlistFilters, WatchlistItem } from "../types";
+import { isAlreadyInLibrary } from "../utils/duplicateHelper";
 
 export class DuplicateWatchlistError extends Error {
   constructor() {
@@ -38,22 +41,67 @@ export const useWatchlist = (filters: WatchlistFilters = {}) => {
       const cachedLists = queryClient.getQueriesData<WatchlistItem[]>({
         queryKey: watchlistKeys.all
       });
+      console.log("MUTATION PAYLOAD:", payload);
+      console.log("CACHED LISTS:", JSON.stringify(cachedLists));
       const exists = cachedLists.some(([, items]) =>
-        items?.some((item) => {
-          const pExt = payload.externalId || payload.imdbId;
-          const iExt = item.externalId || item.imdbId;
-          if (pExt && iExt) {
-            return pExt === iExt;
-          }
-          return false;
-        })
+        isAlreadyInLibrary(
+          payload.source,
+          payload.externalId,
+          items?.filter((item) => !String(item.id).startsWith("temp-"))
+        )
       );
+      console.log("EXISTS RESULT:", exists);
 
       if (exists) {
         return Promise.reject(new DuplicateWatchlistError());
       }
 
       return addWatchlistItem(payload);
+    },
+    onMutate: async (newItemPayload) => {
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: watchlistKeys.all });
+
+      // Snapshot the previous values
+      const previousWatchlists = queryClient.getQueriesData<WatchlistItem[]>({
+        queryKey: watchlistKeys.all
+      });
+
+      // Construct a mock WatchlistItem
+      const mockItem: WatchlistItem = {
+        id: `temp-${Date.now()}`,
+        imdbId: newItemPayload.imdbId ?? null,
+        externalId: newItemPayload.externalId ?? null,
+        source: newItemPayload.source ?? "OMDB",
+        title: newItemPayload.title,
+        author: newItemPayload.author ?? null,
+        year: newItemPayload.year,
+        type: (newItemPayload.type as any) || "movie",
+        contentType: newItemPayload.contentType ?? "MOVIE",
+        collection: newItemPayload.collection ?? null,
+        poster: newItemPayload.poster ?? null,
+        status: newItemPayload.status,
+        rating: null,
+        notes: null,
+        favorite: newItemPayload.favorite ?? false,
+        deletedAt: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      // Optimistically update to all active watchlist query caches
+      queryClient.getQueriesData<WatchlistItem[]>({ queryKey: watchlistKeys.all }).forEach(([queryKey]) => {
+        queryClient.setQueryData<WatchlistItem[]>(queryKey, (old = []) => [...old, mockItem]);
+      });
+
+      return { previousWatchlists };
+    },
+    onError: (_error, _variables, context) => {
+      if (context?.previousWatchlists) {
+        context.previousWatchlists.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
     },
     onSuccess: invalidate
   });
@@ -91,5 +139,15 @@ export const useWatchlist = (filters: WatchlistFilters = {}) => {
     onSettled: invalidate
   });
 
-  return { ...query, addItem, updateItem, deleteItem };
+  const restoreItem = useMutation({
+    mutationFn: (id: string) => restoreWatchlistItem(id),
+    onSuccess: invalidate
+  });
+
+  const deleteItemForever = useMutation({
+    mutationFn: (id: string) => deleteWatchlistItemForever(id),
+    onSuccess: invalidate
+  });
+
+  return { ...query, addItem, updateItem, deleteItem, restoreItem, deleteItemForever };
 };

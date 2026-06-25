@@ -7,7 +7,7 @@ type TabsProps = {
 };
 
 export const Tabs = ({ value, onValueChange, tabs }: TabsProps) => (
-  <div className="inline-flex rounded-md border border-border bg-white p-1">
+  <div className="inline-flex rounded-md border border-border bg-card p-1">
     {tabs.map((tab) => (
       <button
         key={tab.value}

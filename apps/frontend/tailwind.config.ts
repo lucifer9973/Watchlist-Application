@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
@@ -14,7 +15,9 @@ export default {
         "primary-foreground": "hsl(var(--primary-foreground))",
         accent: "hsl(var(--accent))",
         "accent-foreground": "hsl(var(--accent-foreground))",
-        destructive: "hsl(var(--destructive))"
+        destructive: "hsl(var(--destructive))",
+        card: "hsl(var(--card))",
+        "card-foreground": "hsl(var(--foreground))"
       }
     }
   },

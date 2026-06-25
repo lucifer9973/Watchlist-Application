@@ -30,7 +30,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
           return (
             <div
               key={toast.id}
-              className="flex items-center gap-3 rounded-md border border-border bg-white px-3 py-2 shadow-lg"
+              className="flex items-center gap-3 rounded-md border border-border bg-card px-3 py-2 shadow-lg"
             >
               <Icon className={toast.tone === "success" ? "h-5 w-5 text-primary" : "h-5 w-5 text-destructive"} />
               <p className="min-w-0 flex-1 text-sm font-medium">{toast.message}</p>

@@ -17,7 +17,7 @@ type OmdbSearchResponse =
     };
 
 export class OmdbService {
-  private readonly cache = new TtlCache<SearchResult[]>(1000 * 60 * 10);
+  private readonly cache = new TtlCache<SearchResult[]>(1000 * 60 * 60);
 
   async search(query: string, type?: "movie" | "series"): Promise<SearchResult[]> {
     const normalizedQuery = query.trim();

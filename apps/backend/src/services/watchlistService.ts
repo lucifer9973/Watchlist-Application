@@ -31,14 +31,27 @@ export class WatchlistService {
     await this.repository.delete(id);
   }
 
+  async restore(id: string) {
+    const existing = await this.repository.findDeletedById(id);
+    if (!existing) throw new HttpError(404, "Deleted watchlist item not found");
+    await this.repository.restore(id);
+  }
+
+  async deleteForever(id: string) {
+    const existing = await this.repository.findDeletedById(id);
+    if (!existing) throw new HttpError(404, "Deleted watchlist item not found");
+    await this.repository.deleteForever(id);
+  }
+
   async stats() {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const [total, watched, wantToWatch, movies, shows, books, games, recentlyAdded] = await Promise.all([
+    const [total, watched, wantToWatch, watching, movies, shows, books, games, recentlyAdded] = await Promise.all([
       this.repository.count(),
       this.repository.countByStatus("COMPLETED" as WatchStatus),
       this.repository.countByStatus("PLANNED" as WatchStatus),
+      this.repository.countByStatus("WATCHING" as WatchStatus),
       this.repository.countByContentType("MOVIE"),
       this.repository.countByContentType("TV_SHOW"),
       this.repository.countByContentType("BOOK"),
@@ -46,9 +59,8 @@ export class WatchlistService {
       this.repository.countCreatedSince(sevenDaysAgo)
     ]);
 
-
     const completionRate = total === 0 ? 0 : Math.round((watched / total) * 100);
 
-    return { total, watched, wantToWatch, movies, shows, books, games, recentlyAdded, completionRate };
+    return { total, watched, wantToWatch, watching, movies, shows, books, games, recentlyAdded, completionRate };
   }
 }

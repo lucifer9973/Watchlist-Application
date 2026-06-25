@@ -35,4 +35,16 @@ export class WatchlistController {
     await this.service.delete(id);
     res.status(204).send();
   };
+
+  restore = async (req: Request, res: Response) => {
+    const { id } = idParamSchema.parse(req.params);
+    await this.service.restore(id);
+    res.status(200).json({ message: "Restored successfully" });
+  };
+
+  deleteForever = async (req: Request, res: Response) => {
+    const { id } = idParamSchema.parse(req.params);
+    await this.service.deleteForever(id);
+    res.status(204).send();
+  };
 }

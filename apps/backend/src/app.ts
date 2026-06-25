@@ -10,6 +10,7 @@ import { createGamesRoutes } from "./routes/gamesRoutes.js";
 import { createOmdbDetailsRoutes } from "./routes/omdbDetailsRoutes.js";
 import { createSearchRoutes } from "./routes/searchRoutes.js";
 import { createWatchlistRoutes } from "./routes/watchlistRoutes.js";
+import { createCollectionRoutes } from "./routes/collectionRoutes.js";
 
 export const createApp = () => {
   const app = express();
@@ -29,6 +30,7 @@ export const createApp = () => {
   app.use("/api/omdb", createOmdbDetailsRoutes());
   app.use("/api/books", createBooksRoutes());
   app.use("/api/games", createGamesRoutes());
+  app.use("/api/collections", createCollectionRoutes());
 
   app.use(notFoundHandler);
   app.use(errorHandler);
