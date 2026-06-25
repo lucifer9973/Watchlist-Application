@@ -62,6 +62,20 @@ export const useTrendingContent = (loadAdditionalBooks = false) => {
     }))
   });
 
+  const INITIAL_BOOKS = 6;
+  const EXPANDED_BOOKS = 10;
+
+  const books = bookResults
+    .flatMap((query) => query.data ?? [])
+    // Keep stable-ish: unique by external id (fallback imdbID/title)
+    .filter((item, idx, arr) => {
+      const key = item.externalId ?? item.imdbID ?? item.title;
+      return (
+        arr.findIndex((x) => (x.externalId ?? x.imdbID ?? x.title) === key) === idx
+      );
+    })
+    .slice(0, loadAdditionalBooks ? EXPANDED_BOOKS : INITIAL_BOOKS);
+
   return {
     movies: firstOfType(
       movieResults.map((query) => query.data),
@@ -71,9 +85,7 @@ export const useTrendingContent = (loadAdditionalBooks = false) => {
       tvResults.map((query) => query.data),
       "series"
     ),
-    books: bookResults
-      .map((query) => query.data?.[0])
-      .filter((item): item is SearchResult => Boolean(item)),
+    books,
     isLoading: [...movieResults, ...tvResults].some((query) => query.isLoading),
     isError: [...movieResults, ...tvResults].some((query) => query.isError),
     booksLoading: bookResults.some((query) => query.isLoading),
