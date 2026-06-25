@@ -16,14 +16,20 @@ import type { SearchResult, WatchlistItem } from "../types";
 
 const fromWatchlist = (item: WatchlistItem): ContentSummary => ({
   imdbId: item.imdbId,
+  externalId: item.externalId,
+  source: item.source,
   title: item.title,
   year: item.year,
   type: item.type,
-  poster: item.poster
+  poster: item.poster,
+  contentType: item.contentType,
+  collection: item.collection
 });
 
 const fromSearch = (item: SearchResult): ContentSummary => ({
   imdbId: item.imdbID,
+  externalId: item.externalId ?? item.imdbID,
+  source: item.source ?? "OMDB",
   title: item.title,
   year: item.year,
   type: item.type,
@@ -34,10 +40,11 @@ export const HomePage = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<ContentSummary | null>(null);
+  const [loadMoreBooks, setLoadMoreBooks] = useState(false);
   const watchlist = useWatchlist({ sortBy: "createdAt", sortOrder: "desc" });
-  const trending = useTrendingContent();
+  const trending = useTrendingContent(loadMoreBooks);
   const saved = watchlist.data ?? [];
-  const continueWatching = saved.filter((item) => item.status !== "WATCHED").slice(0, 5).map(fromWatchlist);
+  const continueWatching = saved.filter((item) => item.status !== "COMPLETED").slice(0, 5).map(fromWatchlist);
   const recentlyAdded = saved.slice(0, 5).map(fromWatchlist);
 
   return (
@@ -76,7 +83,7 @@ export const HomePage = () => {
             </form>
           </div>
           <Button variant="secondary" onClick={() => navigate("/watchlist")}>
-            Open Watchlist <ArrowRight className="h-4 w-4" />
+            Open Library <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </section>
@@ -91,15 +98,15 @@ export const HomePage = () => {
         ) : (
           <>
             <ContentRail
-              title="Continue Watching"
+              title="Continue Progress"
               description="Saved titles that are still waiting to be finished."
               items={continueWatching}
-              emptyMessage="Everything is marked watched. Nicely done."
+              emptyMessage="Everything is completed. Nicely done."
               onOpenDetails={setSelected}
             />
             <ContentRail
               title="Recently Added"
-              description="The latest titles saved to your watchlist."
+              description="The latest titles saved to your library."
               items={recentlyAdded}
               emptyMessage="Your newest saves will appear here."
               onOpenDetails={setSelected}
@@ -112,10 +119,6 @@ export const HomePage = () => {
             {Array.from({ length: 5 }).map((_, index) => (
               <Skeleton key={index} className="aspect-[2/3]" />
             ))}
-          </div>
-        ) : trending.isError ? (
-          <div className="py-8 text-center text-sm text-destructive">
-            Discovery titles are unavailable right now. <Link className="font-semibold underline" to="/search">Try search</Link>.
           </div>
         ) : (
           <>
@@ -131,6 +134,41 @@ export const HomePage = () => {
               items={trending.shows.map(fromSearch)}
               onOpenDetails={setSelected}
             />
+            {trending.booksLoading ? (
+              <div className="grid grid-cols-2 gap-3 py-8 sm:grid-cols-5">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <Skeleton key={index} className="aspect-[2/3]" />
+                ))}
+              </div>
+            ) : trending.booksError ? (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                Trending books are temporarily unavailable. <Link className="font-semibold underline" to="/search">Search books instead</Link>.
+              </div>
+            ) : trending.books.length === 0 ? (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                More trending books will appear shortly. <Link className="font-semibold underline" to="/search">Search books now</Link>.
+              </div>
+            ) : (
+              <>
+                <ContentRail
+                  title="Trending Books"
+                  description="Popular books selected through Open Library."
+                  items={trending.books.map(fromSearch)}
+                  onOpenDetails={setSelected}
+                />
+                {trending.hasMoreBooks && trending.books.length > 0 && (
+                  <div className="px-4 pb-8">
+                    <Button
+                      variant="secondary"
+                      onClick={() => setLoadMoreBooks(true)}
+                      disabled={loadMoreBooks}
+                    >
+                      {loadMoreBooks ? "Loading..." : "Show More Books"}
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
           </>
         )}
       </div>

@@ -8,7 +8,7 @@ import { AppRoutes } from "./routes/AppRoutes";
 const navItems = [
   { to: "/", label: "Home", icon: Home },
   { to: "/search", label: "Search", icon: Search },
-  { to: "/watchlist", label: "Watchlist", icon: Clapperboard },
+  { to: "/watchlist", label: "Library", icon: Clapperboard },
   { to: "/dashboard", label: "Dashboard", icon: BarChart3 }
 ];
 

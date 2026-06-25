@@ -11,8 +11,10 @@ const repository = () => ({
   count: jest.fn(),
   countByStatus: jest.fn(),
   countByType: jest.fn(),
+  countByContentType: jest.fn(),
   countCreatedSince: jest.fn()
 });
+
 
 describe("WatchlistService", () => {
   it("throws when updating a missing item", async () => {
@@ -29,7 +31,12 @@ describe("WatchlistService", () => {
     const repo = repository();
     repo.count.mockResolvedValue(4 as never);
     repo.countByStatus.mockResolvedValueOnce(2 as never).mockResolvedValueOnce(2 as never);
-    repo.countByType.mockResolvedValueOnce(3 as never).mockResolvedValueOnce(1 as never);
+    repo.countByContentType
+      .mockResolvedValueOnce(3 as never)
+      .mockResolvedValueOnce(1 as never)
+      .mockResolvedValueOnce(0 as never)
+      .mockResolvedValueOnce(0 as never);
+
     repo.countCreatedSince.mockResolvedValue(2 as never);
     const service = new WatchlistService(repo as never);
 
@@ -39,6 +46,8 @@ describe("WatchlistService", () => {
       wantToWatch: 2,
       movies: 3,
       shows: 1,
+      books: 0,
+      games: 0,
       recentlyAdded: 2,
       completionRate: 50
     });

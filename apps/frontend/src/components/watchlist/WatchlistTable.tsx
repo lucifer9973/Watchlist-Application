@@ -36,15 +36,34 @@ export const WatchlistTable = ({ items, onEdit, onOpenDetails, onDelete, isDelet
                 ) : null}
               </div>
               <div>
-                <div className="font-semibold">{item.title}</div>
+                <div className="font-semibold flex flex-wrap items-center gap-2">
+                  {item.title}
+                  {item.collection && (
+                    <Badge tone="success" className="text-xs py-0 px-1.5 font-normal">
+                      {item.collection}
+                    </Badge>
+                  )}
+                </div>
                 <div className="text-sm text-muted-foreground">{item.year}</div>
               </div>
             </div>
           </Td>
-          <Td>{item.type === "series" ? "TV Show" : "Movie"}</Td>
           <Td>
-            <Badge tone={item.status === "WATCHED" ? "success" : "accent"}>
-              {item.status === "WATCHED" ? "Watched" : "Want to Watch"}
+            {item.contentType === "MOVIE"
+              ? "Movie"
+              : item.contentType === "TV_SHOW"
+                ? "TV Show"
+                : item.contentType === "BOOK"
+                  ? "Book"
+                  : item.contentType === "GAME"
+                    ? "Game"
+                    : item.type === "series"
+                      ? "TV Show"
+                      : "Movie"}
+          </Td>
+          <Td>
+            <Badge tone={item.status === "COMPLETED" ? "success" : "accent"}>
+              {item.status === "COMPLETED" ? "Completed" : "Planned"}
             </Badge>
           </Td>
           <Td>{item.rating ?? "-"}</Td>

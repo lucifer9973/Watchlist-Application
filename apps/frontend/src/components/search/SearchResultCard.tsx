@@ -25,20 +25,29 @@ export const SearchResultCard = ({ result, onAdd, onOpenDetails, isAdding }: Pro
       <div className="flex min-w-0 flex-col justify-between gap-3">
         <div>
           <h3 className="truncate font-semibold">{result.title}</h3>
+          {result.author && (
+            <p className="mt-1 truncate text-sm text-muted-foreground">by {result.author}</p>
+          )}
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <Badge>{result.year}</Badge>
-            <Badge tone="accent">{result.type === "series" ? "TV Show" : "Movie"}</Badge>
+            <Badge tone="accent">
+              {result.type === "book"
+                ? "Book"
+                : result.type === "series"
+                  ? "TV Show"
+                  : "Movie"}
+            </Badge>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="ghost" onClick={onOpenDetails}>
             <Eye className="h-4 w-4" /> Details
           </Button>
-          <Button size="sm" onClick={() => onAdd("WANT_TO_WATCH")} disabled={isAdding}>
+          <Button size="sm" onClick={() => onAdd("PLANNED")} disabled={isAdding}>
             <Plus className="h-4 w-4" /> Want
           </Button>
-          <Button size="sm" variant="secondary" onClick={() => onAdd("WATCHED")} disabled={isAdding}>
-            Watched
+          <Button size="sm" variant="secondary" onClick={() => onAdd("COMPLETED")} disabled={isAdding}>
+            Completed
           </Button>
         </div>
       </div>
